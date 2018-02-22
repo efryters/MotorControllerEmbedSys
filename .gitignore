@@ -1,0 +1,9 @@
+
+.jxbrowser-data/
+*.prefs
+*.xml
+*.index
+.metadata/
+RemoteSystemsTempFiles/
+project0/
+I2CTest/Debug/
