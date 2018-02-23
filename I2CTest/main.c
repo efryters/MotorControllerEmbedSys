@@ -19,7 +19,9 @@
 
 int main(void)
 {
-    const char *test = "Hello World\0";
+    const char *greeting = "Hello World\0";
+    const char *clrScreen = "Clearing scrn\0";
+    const char *rstCursor = "Reset Cursor\0";
 
     init_i2c0();
     setup_lcd();
@@ -29,10 +31,18 @@ int main(void)
     //print_char_4bit_mode('b');
     //print_char_4bit_mode('c');
 
-    print_string_4bit_mode(test);
+    print_string_4bit_mode(greeting);
     while(1)
     {
-        delayMs(1000);
+        delayMs(5000);
+        cursor_home();
+        print_string_4bit_mode(clrScreen);
+        delayMs(5000);
+        clear_screen();
+        cursor_home();
+        print_string_4bit_mode("test\0");
+        delayMs(5000);
+
         print_char_4bit_mode('x');
 
     }

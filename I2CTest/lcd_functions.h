@@ -14,14 +14,14 @@ void print_string_4bit_mode(const char *c);
 void write_byte_4bit_mode(uint8_t byte, bool rs);
 void check_busy_flag();
 void backlight_on();
+void clear_screen();
+void cursor_home();
 
 
 //Methods not implemented yet
 uint8_t get_cursor_pos();
 void set_cursor_pos(uint8_t pos_addr);
 void backlight_off();
-void clear_screen();
-void cursor_home();
 
 
 #endif  /* LCDFUNCT_H_  */

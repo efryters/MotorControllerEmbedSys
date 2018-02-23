@@ -48,23 +48,6 @@ void init_i2c0(void)
     HWREG(I2C0_BASE + I2C_O_FIFOCTL) = 80008000;
 }
 
-void i2c_send_2nibble(uint8_t slave_addr, uint8_t args, ...)
-{
-    //sets the address for the i2c module to send to bus
-    I2CMasterSlaveAddrSet(I2C0_BASE, slave_addr, false);
-
-    //stores list of variable num of args
-    va_list vargs;
-
-    //set up va_list to open the last argument, then vargs will know where to look
-    va_start(vargs, args);
-
-    //put data to be sent into FIFO
-    I2CMasterDataPut(I2C0_BASE, va_arg(vargs, uint32_t));
-
-
-
-}
 
 uint32_t i2c_read(uint8_t slave_addr, uint8_t read_addr)
 {

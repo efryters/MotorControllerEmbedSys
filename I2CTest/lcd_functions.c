@@ -107,12 +107,13 @@ void write_byte_4bit_mode(uint8_t byte, bool rs)
     i2c_send(LCD_ADDR, 1, BACKLIGHT);
 }
 
-
+//Write a single character to the display
 void print_char_4bit_mode(const char *c)
 {
     write_byte_4bit_mode((uint8_t) c, true);
 }
 
+//Write a string (char array) to the display at the current cursor position
 void print_string_4bit_mode(const char *c)
 {
     int i = 0;
@@ -123,6 +124,7 @@ void print_string_4bit_mode(const char *c)
     }
 }
 
+//Check for busy flag and hold further execution until BF is cleared
 void check_busy_flag()
 {
     //read DB7, and if true, loop until
@@ -144,3 +146,19 @@ void backlight_off()
 {
     i2c_send(LCD_ADDR, 1, 0x00);
 }
+
+uint8_t get_cursor_pos()
+{
+    while(1);
+
+}
+
+void clear_screen()
+{
+    write_byte_4bit_mode(0x01, false);
+}
+void cursor_home()
+{
+    write_byte_4bit_mode(0x02, false);
+}
+
