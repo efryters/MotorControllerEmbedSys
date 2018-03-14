@@ -23,33 +23,32 @@ char *greeting = "Hello World\0";
 
 void setup_lcd(void)
 {
-    // For some strange reason, 4-bit mode is by default.
-    //Attempting code below to set 4-bit mode messes the board up.
-    /*
+
     i2c_send(LCD_ADDR, 1, 0x00);
     delayMs(15);
+
     //enable LCD
-    i2c_send(LCD_ADDR, 1, EN);
+    trig_en();
     i2c_send(LCD_ADDR, 1, 0x34);
     check_busy_flag();
     i2c_send(LCD_ADDR, 1, 0x00);
     delayUs(4500);
 
 
-    i2c_send(LCD_ADDR, 1, EN);
+    trig_en();
     i2c_send(LCD_ADDR, 1, 0x34);
     check_busy_flag();
     i2c_send(LCD_ADDR, 1, 0x00);
     delayUs(200);
 
 
-    i2c_send(LCD_ADDR, 1, EN);
+    trig_en();
     i2c_send(LCD_ADDR, 2, 0x34,0x24);
     //i2c_send(LCD_ADDR, 1, 0x24|BACKLIGHT);
     i2c_send(LCD_ADDR, 1, 0x00);
     //now in 4-bit interface mode...
-*/
-/*
+
+
     //function set, 2 lines, font set
     write_byte_4bit_mode(0x24, false);
     delayUs(50);
@@ -64,7 +63,7 @@ void setup_lcd(void)
     delayUs(50);
 
     delayMs(15);
-*/
+
     //Clear screen and return cursor home. Twice for reliablilty.
     write_byte_4bit_mode(0x01, false);
     write_byte_4bit_mode(0x02, false);
@@ -160,5 +159,18 @@ void clear_screen()
 void cursor_home()
 {
     write_byte_4bit_mode(0x02, false);
+}
+
+void trig_en()
+{
+    i2c_send(LCD_ADDR, 1, BACKLIGHT);
+    i2c_send(LCD_ADDR, 1, EN|BACKLIGHT);
+    i2c_send(LCD_ADDR, 1, BACKLIGHT);
+}
+
+void cmd_lcd(uint8_t cmd)
+{
+    cmd |= BACKLIGHT;
+    i2c_send(LCD_ADDR, 1, cmd);
 }
 

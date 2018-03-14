@@ -16,6 +16,8 @@ void check_busy_flag();
 void backlight_on();
 void clear_screen();
 void cursor_home();
+void trig_en();
+void cmd_lcd(uint8_t cmd);
 
 
 //Methods not implemented yet
