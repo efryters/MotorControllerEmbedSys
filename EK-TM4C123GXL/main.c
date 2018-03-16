@@ -12,7 +12,7 @@
 #include "driverlib/gpio.h"
 #include "driverlib/pin_map.h"
 #include "lcd/lcd_functions.h"
-#include "lcd/i2c_setup.h"
+#include "i2c/i2c_setup.h"
 #include "delay.h"
 
 

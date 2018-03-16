@@ -8,7 +8,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include "lcd_functions.h"
-#include "i2c_setup.h"
+#include "../i2c/i2c_setup.h"
 #include "delay.h"
 #include <string.h>
 
