@@ -16,13 +16,10 @@ void check_busy_flag();
 void backlight_on();
 void clear_screen();
 void cursor_home();
-void trig_en();
-void cmd_lcd(uint8_t cmd);
-
+void set_cursor_pos(uint8_t row, uint8_t col);
 
 //Methods not implemented yet
 uint8_t get_cursor_pos();
-void set_cursor_pos(uint8_t pos_addr);
 void backlight_off();
 
 

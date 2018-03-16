@@ -19,34 +19,46 @@
 
 int main(void)
 {
+    char letter = 'a';
     const char *greeting = "Hello World\0";
     const char *clrScreen = "Clearing scrn\0";
     const char *rstCursor = "Reset Cursor\0";
 
-    char letter = 0x21;
     init_i2c0();
-    i2c_send(0x27, 1, 0x00);
     setup_lcd();
     backlight_on();
-    //test_lcd();
-    //print_char_4bit_mode('a');
-    //print_char_4bit_mode('b');
-    //print_char_4bit_mode('c');
     clear_screen();
     cursor_home();
 
+    set_cursor_pos(0,0);
     print_string_4bit_mode(greeting);
+    set_cursor_pos(1,0);
+    print_string_4bit_mode(clrScreen);
+    set_cursor_pos(2,0);
+    print_string_4bit_mode(rstCursor);
 
+    int i = 0;
 
     while(1)
     {
-     /*
-     print_char_4bit_mode(letter);
-     delayMs(100);
-     letter++;
-     if (letter> 0x7E)
-         letter = 0x21;
-    */
+        delayMs(5000);
+        set_cursor_pos(0,0);
+        print_string_4bit_mode(greeting);
+        set_cursor_pos(1,0);
+        print_string_4bit_mode(clrScreen);
+        set_cursor_pos(2,0);
+        print_string_4bit_mode(rstCursor);
+
+        set_cursor_pos(3,0);
+        for (i = 0; i < 20; i++)
+        {
+            delayMs(200);
+            print_char_4bit_mode(letter);
+            letter++;
+            if (letter> 0x7E)
+                letter = 0x21;
+        }
+        set_cursor_pos(3,19);
     }
 
     return 0;

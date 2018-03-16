@@ -19,56 +19,56 @@
  *
  */
 
-char *greeting = "Hello World\0";
+
 
 void setup_lcd(void)
 {
 
+    /*
+     *        08   04   02   01   08   04   02   01
+     *      +----+----+----+----+----+----+----+----+
+     *      | D7 | D6 | D5 | D4 | BL | EN | RW | RS |
+     * BIT7 +----+----+----+----+----+----+----+----+ BIT0
+     *
+     *
+     */
+
+
+    //LCD init begin
     i2c_send(LCD_ADDR, 1, 0x00);
     delayMs(15);
 
-    //enable LCD
-    trig_en();
-    i2c_send(LCD_ADDR, 1, 0x34);
-    check_busy_flag();
-    i2c_send(LCD_ADDR, 1, 0x00);
+    i2c_send(LCD_ADDR, 2, 0x34, BACKLIGHT);
     delayUs(4500);
 
-
-    trig_en();
-    i2c_send(LCD_ADDR, 1, 0x34);
-    check_busy_flag();
-    i2c_send(LCD_ADDR, 1, 0x00);
+    i2c_send(LCD_ADDR, 2, 0x34, BACKLIGHT);
     delayUs(200);
 
+    i2c_send(LCD_ADDR, 2, 0x34, BACKLIGHT);
+    delayUs(100);
+    i2c_send(LCD_ADDR, 2, 0x24, BACKLIGHT);
 
-    trig_en();
-    i2c_send(LCD_ADDR, 2, 0x34,0x24);
-    //i2c_send(LCD_ADDR, 1, 0x24|BACKLIGHT);
-    i2c_send(LCD_ADDR, 1, 0x00);
     //now in 4-bit interface mode...
-
-
     //function set, 2 lines, font set
-    write_byte_4bit_mode(0x24, false);
-    delayUs(50);
+    write_byte_4bit_mode(0x38, false);
+    delayMs(5);
     //display off
     write_byte_4bit_mode(0x08, false);
     delayUs(50);
-    //display clear
-    write_byte_4bit_mode(0x01, false);
-    delayUs(50);
+
     //set entry mode (increment by 1 after data in, with no disp shift)
     write_byte_4bit_mode(0x06, false);
     delayUs(50);
 
+    clear_screen();
+    cursor_home();
+
+    //write_byte_4bit_mode(0x10, false);
+    //write_byte_4bit_mode(0x10, false);
+
     delayMs(15);
 
     //Clear screen and return cursor home. Twice for reliablilty.
-    write_byte_4bit_mode(0x01, false);
-    write_byte_4bit_mode(0x02, false);
-    write_byte_4bit_mode(0x01, false);
-    write_byte_4bit_mode(0x02, false);
 }
 
 ///Register select RS, true to select CGRAM
@@ -77,6 +77,7 @@ void write_byte_4bit_mode(uint8_t byte, bool rs)
 {
 
     uint8_t rs_en;
+
     //with backlight, always
     if (rs)
     {
@@ -99,10 +100,9 @@ void write_byte_4bit_mode(uint8_t byte, bool rs)
     upper |= rs_en;
 
     //send our mangled bytes to i2c, then close enable, but leave on backlight
-    i2c_send(LCD_ADDR, 1, rs_en);
-    i2c_send(LCD_ADDR, 1, upper);
+    i2c_send(LCD_ADDR, 2, upper, BACKLIGHT);
+    i2c_send(LCD_ADDR, 2, lower, BACKLIGHT);
     check_busy_flag();
-    i2c_send(LCD_ADDR, 1, lower);
     i2c_send(LCD_ADDR, 1, BACKLIGHT);
 }
 
@@ -127,13 +127,10 @@ void print_string_4bit_mode(const char *c)
 void check_busy_flag()
 {
     //read DB7, and if true, loop until
-    uint32_t read = i2c_read(LCD_ADDR, 0x80);
+    //uint32_t read = ;
+    delayUs(2000);
+    //while((uint8_t)i2c_read(LCD_ADDR, 0x80) != 0x80) {}
 
-
-    while(read != 0x80)
-    {
-        read = i2c_read(LCD_ADDR, 0x80);
-    }
 }
 
 void backlight_on()
@@ -146,31 +143,36 @@ void backlight_off()
     i2c_send(LCD_ADDR, 1, 0x00);
 }
 
-uint8_t get_cursor_pos()
-{
-    while(1);
-
-}
-
 void clear_screen()
 {
     write_byte_4bit_mode(0x01, false);
+    delayMs(20);
 }
 void cursor_home()
 {
     write_byte_4bit_mode(0x02, false);
+    delayMs(20);
 }
 
-void trig_en()
+void set_cursor_pos(uint8_t row, uint8_t col)
 {
-    i2c_send(LCD_ADDR, 1, BACKLIGHT);
-    i2c_send(LCD_ADDR, 1, EN|BACKLIGHT);
-    i2c_send(LCD_ADDR, 1, BACKLIGHT);
-}
+    char address;
 
-void cmd_lcd(uint8_t cmd)
-{
-    cmd |= BACKLIGHT;
-    i2c_send(LCD_ADDR, 1, cmd);
+    if (row == 0)
+        address = 0;
+    else if (row==1)
+        address = 0x40;
+    else if (row==2)
+        address = 0x14;
+    else if (row==3)
+        address = 0x54;
+    else
+        address = 0;
+
+    address |= col;
+
+    write_byte_4bit_mode(0x80 | address, false);
+    delayUs(45);
+
 }
 
