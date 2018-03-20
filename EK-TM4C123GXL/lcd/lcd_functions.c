@@ -16,10 +16,7 @@
 /*
  * 1. init lcd in 4-bit mode (using full byte sends via i2c)
  * 2. after init, begin sending data via nibble mode.
- *
  */
-
-
 
 void setup_lcd(void)
 {
@@ -169,10 +166,64 @@ void set_cursor_pos(uint8_t row, uint8_t col)
     else
         address = 0;
 
-    address |= col;
+    address += col;
 
     write_byte_4bit_mode(0x80 | address, false);
     delayUs(45);
 
 }
 
+/*
+ * Print a string to LCD with given layout
+ * Parameters:
+ * const char *c: string to print
+ *             j: justification setting
+ *                  0: left justified
+ *                  1: center
+ *                  2: right justified
+ *           row: LCD row to print at
+ */
+void print_string_justify(const char *c, uint8_t j, uint8_t row)
+{
+    uint8_t len;
+    if(j != 0)
+    {
+        len = strlen(c);
+    }
+    else
+    {
+        //uint8_t center;
+        //center = 0;
+    }
+    switch(j)
+    {
+    case 0: //left justify, normal print
+        set_cursor_pos(row, 0);
+        print_string_4bit_mode(c);
+        break;
+    case 1: //print center
+        set_cursor_pos(row, (10 - (len/2)));
+        print_string_4bit_mode(c);
+        break;
+    case 2:
+        set_cursor_pos(row, (20 - len));
+        print_string_4bit_mode(c);
+        break;
+    default:
+        set_cursor_pos(row, 0);
+        print_string_4bit_mode(c);
+    }
+    set_cursor_pos(row+1,0);
+}
+
+void print_busy_cursor(uint8_t row, uint8_t col)
+{
+    char busy[4] = { '/', '-' , 0x5C, '|'};
+    int i;
+    for(i = 0; i < 4; i++)
+    {
+    set_cursor_pos(row, col);
+    print_char_4bit_mode(busy[i]);
+    delayMs(150);
+    }
+}
