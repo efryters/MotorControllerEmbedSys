@@ -190,11 +190,6 @@ void print_string_justify(const char *c, uint8_t j, uint8_t row)
     {
         len = strlen(c);
     }
-    else
-    {
-        //uint8_t center;
-        //center = 0;
-    }
     switch(j)
     {
     case 0: //left justify, normal print
