@@ -21,10 +21,9 @@
 #include "keypad.h"
 
 
-void Init_port(void)
+void init_port(void)
 {
     volatile uint32_t ui32Loop;
-    SysCtlClockSet(SYSCTL_SYSDIV_5 | SYSCTL_USE_PLL| SYSCTL_XTAL_16MHZ|SYSCTL_OSC_MAIN);
     SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOC);
     while (!SysCtlPeripheralReady(SYSCTL_PERIPH_GPIOC))
     {
@@ -37,7 +36,7 @@ void Init_port(void)
     }
 
 }
-void Define_pins(void){
+void define_pins(void){
 
     GPIOPinTypeGPIOInput(GPIO_PORTC_BASE, GPIO_PIN_4|GPIO_PIN_5|GPIO_PIN_6|GPIO_PIN_7);
     GPIOPinTypeGPIOOutput(GPIO_PORTE_BASE, GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_3);
