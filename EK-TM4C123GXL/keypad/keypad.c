@@ -20,34 +20,26 @@
 
 #include "keypad.h"
 
-
 uint8_t prev;
 void init_keypad(void)
 {
 
     SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOC);
-    while (!SysCtlPeripheralReady(SYSCTL_PERIPH_GPIOC))
-    {
-    //printf("Waiting for Port C\n");
-    }
+    while (!SysCtlPeripheralReady(SYSCTL_PERIPH_GPIOC)){}
     SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOE);
-    while (!SysCtlPeripheralReady(SYSCTL_PERIPH_GPIOE))
-    {
-    //printf("Waiting for Port E\n");
-    }
+    while (!SysCtlPeripheralReady(SYSCTL_PERIPH_GPIOE)){}
 
-    GPIOPinTypeGPIOInput(GPIO_PORTC_BASE, GPIO_PIN_4|GPIO_PIN_5|GPIO_PIN_6|GPIO_PIN_7);
-    //GPIOPinTypeGPIOInput(GPIO_PORTE_BASE, GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_3);
-    GPIOPadConfigSet(GPIO_PORTC_BASE, GPIO_PIN_4|GPIO_PIN_5|GPIO_PIN_6|GPIO_PIN_7, GPIO_STRENGTH_4MA, GPIO_PIN_TYPE_STD_WPD);
+    GPIOPinTypeGPIOInput(ROW_BASE, ROW_PINS);
+    GPIOPadConfigSet(ROW_BASE, ROW_PINS, GPIO_STRENGTH_4MA, GPIO_PIN_TYPE_STD_WPD);
 
-    GPIOPinTypeGPIOOutput(GPIO_PORTE_BASE,  GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_3);
-    GPIOPadConfigSet(GPIO_PORTE_BASE, GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_3, GPIO_STRENGTH_4MA, GPIO_PIN_TYPE_STD);
+    GPIOPinTypeGPIOOutput(COL_BASE,  COL_PINS);
+    GPIOPadConfigSet(COL_BASE, COL_PINS, GPIO_STRENGTH_4MA, GPIO_PIN_TYPE_STD);
 
     prev = 0x00;
 }
 
 
-/*
+/*      +-------UPPER-------+------LOWER--------+
  *        08   04   02   01   08   04   02   01
  *      +----+----+----+----+----+----+----+----+
  *      | R1 | R2 | R3 | R0 | C2 | C0 | C1 | xx |
@@ -60,34 +52,31 @@ uint8_t scan_keypad()
 {
     uint8_t read;
     uint8_t key;
-    key = 0x20;
+    key = 0x20; //Default to ascii space
 
 
     uint8_t upper;
     uint8_t lower;
 
-    //GET ROW
-    GPIOPinWrite(GPIO_PORTE_BASE, GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_3, 0x0E);
-    upper = GPIOPinRead(GPIO_PORTC_BASE, GPIO_PIN_4|GPIO_PIN_5|GPIO_PIN_6|GPIO_PIN_7);
+    //Read selected row
+    GPIOPinWrite(COL_BASE, COL_PINS, 0x0E);
+    upper = GPIOPinRead(ROW_BASE, ROW_PINS);
 
-    //READ COLUMN
-    GPIOPinTypeGPIOOutput(GPIO_PORTC_BASE, GPIO_PIN_4|GPIO_PIN_5|GPIO_PIN_6|GPIO_PIN_7);
-    GPIOPadConfigSet(GPIO_PORTC_BASE, GPIO_PIN_4|GPIO_PIN_5|GPIO_PIN_6|GPIO_PIN_7, GPIO_STRENGTH_4MA, GPIO_PIN_TYPE_STD);
+    //Switch pin roles and read selected column
+    GPIOPinTypeGPIOOutput(ROW_BASE, ROW_PINS);
+    GPIOPadConfigSet(ROW_BASE, ROW_PINS, GPIO_STRENGTH_4MA, GPIO_PIN_TYPE_STD);
+    GPIOPinTypeGPIOInput(COL_BASE,  COL_PINS);
+    GPIOPadConfigSet(COL_BASE, COL_PINS, GPIO_STRENGTH_4MA, GPIO_PIN_TYPE_STD_WPD);
 
-    GPIOPinTypeGPIOInput(GPIO_PORTE_BASE,  GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_3);
-    GPIOPadConfigSet(GPIO_PORTE_BASE, GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_3, GPIO_STRENGTH_4MA, GPIO_PIN_TYPE_STD_WPD);
+    GPIOPinWrite(ROW_BASE, ROW_PINS, upper);
 
-    GPIOPinWrite(GPIO_PORTC_BASE, GPIO_PIN_4|GPIO_PIN_5|GPIO_PIN_6|GPIO_PIN_7, upper);
+    lower = GPIOPinRead(COL_BASE, COL_PINS);
 
-    lower = GPIOPinRead(GPIO_PORTE_BASE, GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_3);
-
-    //Restore pin config
-    GPIOPinTypeGPIOInput(GPIO_PORTC_BASE, GPIO_PIN_4|GPIO_PIN_5|GPIO_PIN_6|GPIO_PIN_7);
-    //GPIOPinTypeGPIOInput(GPIO_PORTE_BASE, GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_3);
-    GPIOPadConfigSet(GPIO_PORTC_BASE, GPIO_PIN_4|GPIO_PIN_5|GPIO_PIN_6|GPIO_PIN_7, GPIO_STRENGTH_4MA, GPIO_PIN_TYPE_STD_WPD);
-
-    GPIOPinTypeGPIOOutput(GPIO_PORTE_BASE,  GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_3);
-    GPIOPadConfigSet(GPIO_PORTE_BASE, GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_3, GPIO_STRENGTH_4MA, GPIO_PIN_TYPE_STD);
+    //Restore previous pin settings.
+    GPIOPinTypeGPIOInput(ROW_BASE, ROW_PINS);
+    GPIOPadConfigSet(ROW_BASE, ROW_PINS, GPIO_STRENGTH_4MA, GPIO_PIN_TYPE_STD_WPD);
+    GPIOPinTypeGPIOOutput(COL_BASE,  COL_PINS);
+    GPIOPadConfigSet(COL_BASE, COL_PINS, GPIO_STRENGTH_4MA, GPIO_PIN_TYPE_STD);
 
     read = upper | lower;
 
@@ -135,10 +124,7 @@ uint8_t scan_keypad()
             break;
         default:
             key = 'x';
-
         }
-
     }
-
     return key;
 }

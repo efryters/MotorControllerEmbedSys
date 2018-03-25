@@ -15,6 +15,12 @@
 #define KP_ASTERISK 0x24
 #define KP_POUND 0x28
 
+// Pin defines
+#define ROW_PINS GPIO_PIN_4|GPIO_PIN_5|GPIO_PIN_6|GPIO_PIN_7
+#define ROW_BASE GPIO_PORTC_BASE
+#define COL_PINS GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_3
+#define COL_BASE GPIO_PORTE_BASE
+
 // Method Prototype
 void init_keypad(void);
 uint8_t scan_keypad();
