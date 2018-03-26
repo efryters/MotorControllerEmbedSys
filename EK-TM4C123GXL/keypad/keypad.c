@@ -17,6 +17,7 @@
 #include "driverlib/sysctl.h"
 #include "driverlib/gpio.h"
 #include "driverlib/pin_map.h"
+#include "../lcd/lcd_functions.h"
 
 #include "keypad.h"
 
@@ -42,7 +43,7 @@ void init_keypad(void)
 /*      +-------UPPER-------+------LOWER--------+
  *        08   04   02   01   08   04   02   01
  *      +----+----+----+----+----+----+----+----+
- *      | R1 | R2 | R3 | R0 | C2 | C0 | C1 | xx |
+ *      | R2 | R3 | R4 | R1 | C3 | C1 | C2 | xx |
  * BIT7 +----+----+----+----+----+----+----+----+ BIT0
  *      | C7 | C6 | C5 | C4 | E3 | E2 | E1 | xx |
  *
@@ -84,6 +85,7 @@ uint8_t scan_keypad()
     {
         delayMs(40);
 
+        //prev = read;
         switch (read)
         {
         case KP_ASTERISK:
@@ -123,8 +125,26 @@ uint8_t scan_keypad()
             key = '0';
             break;
         default:
-            key = 'x';
+            key = 0x20;
         }
     }
     return key;
+}
+
+uint32_t get_input()
+{
+    uint32_t pass;
+    pass = 0x00000000;
+    char k;
+
+    while (scan_keypad() != '*')
+    {
+        if (scan_keypad() != ' ')
+        {
+           k = scan_keypad();
+           pass = pass << k;
+           print_char_4bit_mode(k);
+        }
+    }
+    return pass;
 }

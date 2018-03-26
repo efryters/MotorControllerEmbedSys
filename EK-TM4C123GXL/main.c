@@ -19,7 +19,9 @@
 
 
 int main(void)
+
 {
+    uint32_t test;
 
     init_i2c0();
     setup_lcd();
@@ -29,11 +31,11 @@ int main(void)
     init_keypad();
 
     set_cursor_pos(0, 0);
-
+    test = get_input();
     while(1)
     {
         delayMs(500);
-        print_char_4bit_mode( scan_keypad() );
+        //print_char_4bit_mode( scan_keypad() );
     }
 
     return 0;
