@@ -25,6 +25,7 @@
 void init_keypad(void);
 uint8_t scan_keypad();
 uint32_t get_input();
+char get_char(uint8_t key_code);
 
 
 

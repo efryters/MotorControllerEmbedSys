@@ -49,6 +49,10 @@ void init_keypad(void)
  *
  */
 
+
+/**
+ * Returns the key code for the button pressed, or 0xff is nothing pressed.
+ */
 uint8_t scan_keypad()
 {
     uint8_t read;
@@ -59,6 +63,7 @@ uint8_t scan_keypad()
     uint8_t upper;
     uint8_t lower;
 
+    delayMs(80);
     //Read selected row
     GPIOPinWrite(COL_BASE, COL_PINS, 0x0E);
     upper = GPIOPinRead(ROW_BASE, ROW_PINS);
@@ -81,69 +86,78 @@ uint8_t scan_keypad()
 
     read = upper | lower;
 
-    if (read != prev)
-    {
-        delayMs(40);
+    return read;
+}
 
-        //prev = read;
-        switch (read)
-        {
+char get_char(uint8_t key_code)
+{
+    switch (key_code)
+    {
         case KP_ASTERISK:
-            key = '*';
+            return '*';
             break;
         case KP_POUND:
-            key = '#';
+            return '#';
             break;
         case KP_ONE:
-            key = '1';
+            return '1';
             break;
         case KP_TWO:
-            key = '2';
+            return '2';
             break;
         case KP_THREE:
-            key = '3';
+            return '3';
             break;
         case KP_FOUR:
-            key = '4';
+            return '4';
             break;
         case KP_FIVE:
-            key = '5';
+            return '5';
             break;
         case KP_SIX:
-            key = '6';
+            return'6';
             break;
         case KP_SEVEN:
-            key = '7';
+            return '7';
             break;
         case KP_EIGHT:
-            key = '8';
+            return '8';
             break;
         case KP_NINE:
-            key = '9';
+            return '9';
             break;
         case KP_ZERO:
-            key = '0';
+            return '0';
             break;
         default:
-            key = 0x20;
-        }
+            return 0xff;
     }
-    return key;
 }
 
 uint32_t get_input()
 {
+    bool accept;
+    accept = false;
     uint32_t pass;
     pass = 0x00000000;
-    char k;
+    char k = 0xff;
 
-    while (scan_keypad() != '*')
+    while (!accept)
     {
-        if (scan_keypad() != ' ')
+        while (!accept)
         {
-           k = scan_keypad();
-           pass = pass << k;
-           print_char_4bit_mode(k);
+            k = get_char(scan_keypad());
+            if (k != 0x2a)
+            {
+               //pass = pass << k;
+               if (k!=0xff)
+               {
+                   print_char_4bit_mode(k);
+                   delayMs(200);
+               }
+               }
+            else
+                accept = true;
         }
     }
     return pass;

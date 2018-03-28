@@ -30,12 +30,15 @@ int main(void)
     cursor_home();
     init_keypad();
 
-    set_cursor_pos(0, 0);
-    test = get_input();
+
     while(1)
     {
-        delayMs(500);
-        //print_char_4bit_mode( scan_keypad() );
+        delayMs(1500);
+        clear_screen();
+        set_cursor_pos(0, 0);
+        test = get_input();
+        set_cursor_pos(1, 0);
+        print_string_justify("Input accept!", 1, 1);
     }
 
     return 0;
