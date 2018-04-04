@@ -46,11 +46,11 @@ void disp_main_menu()
     clear_screen();
     print_string_justify("Solar Controller", 1, 0);
     print_string_justify("Please type passwd", 1, 1);
-    print_string_justify("Push # to start...", 0, 3);
+    print_string_justify("Push # to start...", 0, 2);
     cursor_off();
     while(get_input() != '#') {} //loop while waiting for "escape" key
-    clear_line(3);
-    print_string_justify("Loading menu...", 0, 3);
+    clear_line(2);
+    get_ct_input(1, 2);
     delayMs(1000*5);
 
 }
