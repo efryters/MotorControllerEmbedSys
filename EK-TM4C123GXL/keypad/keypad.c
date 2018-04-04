@@ -22,6 +22,10 @@
 #include "keypad.h"
 
 uint8_t prev;
+
+/*
+ * This sets up the appropriate ports and pins for the keypad
+ */
 void init_keypad(void)
 {
 
@@ -47,18 +51,17 @@ void init_keypad(void)
  * BIT7 +----+----+----+----+----+----+----+----+ BIT0
  *      | C7 | C6 | C5 | C4 | E3 | E2 | E1 | xx |
  *
+ *         KEYPAD BUTTONS ----> PINS MAPPINGS
  */
 
 
 /**
- * Returns the key code for the button pressed, or 0xff is nothing pressed.
+ * Returns the keypad code for the button pressed, or 0xff is nothing pressed.
+ * This should run in a loop that exits when KP_POUND/'#' is detected
  */
 uint8_t scan_keypad()
 {
     uint8_t read;
-    uint8_t key;
-    key = 0x20; //Default to ascii space
-
 
     uint8_t upper;
     uint8_t lower;
@@ -89,6 +92,9 @@ uint8_t scan_keypad()
     return read;
 }
 
+/*
+ * Used to convert a given keypad code into a char
+*/
 char get_char(uint8_t key_code)
 {
     switch (key_code)
@@ -134,7 +140,12 @@ char get_char(uint8_t key_code)
     }
 }
 
-uint32_t get_input()
+/*
+ * This actually scans for the keycode from the keypad and performs needed debouncing
+ * then returns a char of the key pressed.
+ * Needs optimizations curretly, but its working for the most part.
+ */
+char get_input()
 {
     bool accept;
     accept = false;
@@ -142,23 +153,41 @@ uint32_t get_input()
     pass = 0x00000000;
     char k = 0xff;
 
-    while (!accept)
-    {
         while (!accept)
         {
             k = get_char(scan_keypad());
+            pass = k;
             if (k != 0x2a)
             {
-               //pass = pass << k;
                if (k!=0xff)
                {
-                   print_char_4bit_mode(k);
+                   return k;
+                   /// TODO: optimize this part... or rather the entire function get_input.
+                   //print_char_4bit_mode(k);
                    delayMs(200);
                }
                }
             else
                 accept = true;
         }
-    }
     return pass;
+}
+
+/* UNFINISHED
+ * This function will
+ * 1. Print on LCD underscores, or blocks to indicate to the user
+ *    the slots they have to input a number
+ * 2. Enable keypad input of only as many as defined by parameter "number_of_chars"
+ * 3. Exit the function and return the numbers inputted for processing.
+*/
+uint8_t get_ct_input(int number_of_chars)
+{
+    int ct;
+    ct = 0;
+    while (ct < number_of_chars)
+    {
+        //if (get_input != )
+
+    }
+
 }

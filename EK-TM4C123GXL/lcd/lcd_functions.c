@@ -17,7 +17,6 @@
  * 1. init lcd in 4-bit mode (using full byte sends via i2c)
  * 2. after init, begin sending data via nibble mode.
  */
-
 void setup_lcd(void)
 {
 
@@ -27,7 +26,7 @@ void setup_lcd(void)
      *      | D7 | D6 | D5 | D4 | BL | EN | RW | RS |
      * BIT7 +----+----+----+----+----+----+----+----+ BIT0
      *
-     *
+     *          DATA BYTE MAPPINGS FOR LCD (i2c)
      */
 
 
@@ -68,8 +67,10 @@ void setup_lcd(void)
     //Clear screen and return cursor home. Twice for reliablilty.
 }
 
-///Register select RS, true to select CGRAM
-///Input is the 8-bit for D0-D7, as noted in datasheet for LCD
+/*
+ * Register select RS, true to select CGRAM
+ * Input is the 8-bit for D0-D7, as noted in datasheet for LCD
+ */
 void write_byte_4bit_mode(uint8_t byte, bool rs)
 {
 
@@ -103,13 +104,17 @@ void write_byte_4bit_mode(uint8_t byte, bool rs)
     i2c_send(LCD_ADDR, 1, BACKLIGHT);
 }
 
-//Write a single character to the display
+/*
+ * Write a single character to the display
+ */
 void print_char_4bit_mode(const char *c)
 {
     write_byte_4bit_mode((uint8_t) c, true);
 }
 
-//Write a string (char array) to the display at the current cursor position
+/*
+ * Write a string (char array) to the display at the current cursor position
+ */
 void print_string_4bit_mode(const char *c)
 {
     int i = 0;
@@ -120,7 +125,10 @@ void print_string_4bit_mode(const char *c)
     }
 }
 
-//Check for busy flag and hold further execution until BF is cleared
+/*
+ * check busy flag not needed anymore... Replaced with a delay to insure that LCD MCU is not
+ * ever in a busy state.
+ */
 void check_busy_flag()
 {
     //read DB7, and if true, loop until
@@ -130,6 +138,9 @@ void check_busy_flag()
 
 }
 
+/*
+ * Some more LCD helper functions below... Performs as titled.
+ */
 void backlight_on()
 {
     i2c_send(LCD_ADDR, 1, BACKLIGHT);
@@ -151,6 +162,12 @@ void cursor_home()
     delayMs(20);
 }
 
+/*
+ * Sets the cursor position on the LCD with given parameters
+ * Parameters:
+ *      uint8_t row: zero-based index row selection
+ *      uint8_t col: zero-based index column selection
+ */
 void set_cursor_pos(uint8_t row, uint8_t col)
 {
     char address;
@@ -211,6 +228,10 @@ void print_string_justify(const char *c, uint8_t j, uint8_t row)
     set_cursor_pos(row+1,0);
 }
 
+/*
+ * Playing around with ascii animations.
+ * A choppy busy cursor. Could be improved.
+ */
 void print_busy_cursor(uint8_t row, uint8_t col)
 {
     char busy[4] = { '/', '-' , 0x5C, '|'};
@@ -222,3 +243,30 @@ void print_busy_cursor(uint8_t row, uint8_t col)
     delayMs(150);
     }
 }
+
+/*
+ * As named, turns cursor on/off
+ */
+void cursor_on()
+{
+    write_byte_4bit_mode(0x0F, false);
+}
+void cursor_off()
+{
+    write_byte_4bit_mode(0x0C, false);
+}
+
+/*
+ * Given a row, this function simply clears the line on the LCD
+ * or in other words, overwrites with ' ' / SPACES
+ */
+void clear_line(uint8_t row)
+{
+    uint8_t i;
+    set_cursor_pos(row, 0);
+    for (i = 0; i<20; i++)
+    {
+        print_char_4bit_mode(' ');
+    }
+}
+

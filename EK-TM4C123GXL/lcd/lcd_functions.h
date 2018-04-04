@@ -7,6 +7,10 @@
 #define BACKLIGHT 0x08
 
 
+//Common LCD chars for functions
+#define UNDERSCORE 0x5f
+
+
 //Methods Implemented
 void setup_lcd(void);
 void print_char_4bit_mode(const char *c);
@@ -19,6 +23,9 @@ void cursor_home();
 void set_cursor_pos(uint8_t row, uint8_t col);
 void print_string_justify(const char *c, uint8_t j, uint8_t row);
 void print_busy_cursor(uint8_t row, uint8_t col);
+void cursor_on();
+void cursor_off();
+void clear_line(uint8_t row);
 
 //Methods not implemented yet
 uint8_t get_cursor_pos();

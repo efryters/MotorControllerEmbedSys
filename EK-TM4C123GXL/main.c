@@ -16,12 +16,14 @@
 #include "delay.h"
 #include "keypad/keypad.h"
 
+/*
+ * Prototypes
+ */
 
+void disp_main_menu();
 
 int main(void)
-
 {
-    uint32_t test;
 
     init_i2c0();
     setup_lcd();
@@ -33,15 +35,23 @@ int main(void)
 
     while(1)
     {
-        delayMs(1500);
-        clear_screen();
-        set_cursor_pos(0, 0);
-        test = get_input();
-        set_cursor_pos(1, 0);
-        print_string_justify("Input accept!", 1, 1);
+        disp_main_menu();
     }
 
     return 0;
 }
 
+void disp_main_menu()
+{
+    clear_screen();
+    print_string_justify("Solar Controller", 1, 0);
+    print_string_justify("Please type passwd", 1, 1);
+    print_string_justify("Push # to start...", 0, 3);
+    cursor_off();
+    while(get_input() != '#') {} //loop while waiting for "escape" key
+    clear_line(3);
+    print_string_justify("Loading menu...", 0, 3);
+    delayMs(1000*5);
+
+}
 
