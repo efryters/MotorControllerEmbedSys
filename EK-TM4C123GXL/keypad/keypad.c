@@ -8,6 +8,7 @@
 #include <stdarg.h>
 #include <stdbool.h>
 #include <stdint.h>
+#include <stdlib.h>
 
 
 #include "inc/hw_i2c.h"
@@ -181,7 +182,7 @@ char get_input()
  * 2. Enable keypad input of only as many as defined by parameter "number_of_chars"
  * 3. Exit the function and return the numbers inputted for processing.
 */
-uint8_t get_ct_input(uint8_t justify, uint8_t row)
+uint16_t get_ct_input(uint8_t justify, uint8_t row, bool password)
 {
     uint8_t ct;
     ct = 0;
@@ -211,24 +212,32 @@ uint8_t get_ct_input(uint8_t justify, uint8_t row)
     //key = { '0', '0', '0', '0' };
 
 
-
     set_cursor_pos(row, col);
     cursor_on();
     while (ct < 4)
     {
         delayMs(75);
         buf = get_input();
-        if ( buf != '#')
+        if ( buf != '#' || buf != '*')
         {
             key[ct] = buf;
-            print_char_4bit_mode(buf);
+            if (password)
+                print_char_4bit_mode('*');
+            else
+                print_char_4bit_mode(buf);
             ct++;
         }
     }
+    //Add null termination
     key[4] = '\0';
+
+    /*
     set_cursor_pos(row+1, 0);
     print_string_4bit_mode("inputted ");
     print_string_4bit_mode(&key);
+     */
     cursor_off();
+
+    return (uint16_t) atoi(key);
 
 }

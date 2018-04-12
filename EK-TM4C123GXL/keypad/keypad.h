@@ -26,7 +26,7 @@ void init_keypad(void);
 uint8_t scan_keypad();
 char get_input();
 char get_char(uint8_t key_code);
-uint8_t get_ct_input(uint8_t justify, uint8_t row);
+uint16_t get_ct_input(uint8_t justify, uint8_t row, bool password);
 
 
 

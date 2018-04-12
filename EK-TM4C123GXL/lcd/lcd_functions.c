@@ -7,6 +7,7 @@
 #include <stdarg.h>
 #include <stdbool.h>
 #include <stdint.h>
+
 #include "lcd_functions.h"
 #include "../i2c/i2c_setup.h"
 #include "delay.h"
@@ -225,7 +226,8 @@ void print_string_justify(const char *c, uint8_t j, uint8_t row)
         set_cursor_pos(row, 0);
         print_string_4bit_mode(c);
     }
-    set_cursor_pos(row+1,0);
+    //set_cursor_pos(row+1,0);
+    cursor_off();
 }
 
 /*
