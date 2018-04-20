@@ -8,6 +8,8 @@
 #include <stdarg.h>
 #include <stdbool.h>
 #include <stdint.h>
+#include <stdlib.h>
+
 
 #include "inc/hw_i2c.h"
 #include "inc/hw_memmap.h"
@@ -28,7 +30,6 @@ uint8_t prev;
  */
 void init_keypad(void)
 {
-
     SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOC);
     while (!SysCtlPeripheralReady(SYSCTL_PERIPH_GPIOC)){}
     SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOE);
@@ -153,6 +154,7 @@ char get_input()
     pass = 0x00000000;
     char k = 0xff;
 
+
         while (!accept)
         {
             k = get_char(scan_keypad());
@@ -180,14 +182,62 @@ char get_input()
  * 2. Enable keypad input of only as many as defined by parameter "number_of_chars"
  * 3. Exit the function and return the numbers inputted for processing.
 */
-uint8_t get_ct_input(int number_of_chars)
+uint16_t get_ct_input(uint8_t justify, uint8_t row, bool password)
 {
-    int ct;
+    uint8_t ct;
     ct = 0;
-    while (ct < number_of_chars)
-    {
-        //if (get_input != )
+    char buf;
+    buf = '0';
+    char *uscore = "____";
+    int col;
 
+    print_string_justify( uscore, justify, row);
+
+    switch( justify )
+    {
+        case 0: //left justify, normal print
+            col = 0;
+            break;
+        case 1: //print center
+            col = (10 - (4/2));
+            break;
+        case 2:
+            col = (20 - 4);
+            break;
+        default:
     }
+
+
+    char key[5];
+    //key = { '0', '0', '0', '0' };
+
+
+    set_cursor_pos(row, col);
+    cursor_on();
+    while (ct < 4)
+    {
+        delayMs(75);
+        buf = get_input();
+        if ( buf != '#' || buf != '*')
+        {
+            key[ct] = buf;
+            if (password)
+                print_char_4bit_mode('*');
+            else
+                print_char_4bit_mode(buf);
+            ct++;
+        }
+    }
+    //Add null termination
+    key[4] = '\0';
+
+    /*
+    set_cursor_pos(row+1, 0);
+    print_string_4bit_mode("inputted ");
+    print_string_4bit_mode(&key);
+     */
+    cursor_off();
+
+    return (uint16_t) atoi(key);
 
 }
