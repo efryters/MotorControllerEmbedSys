@@ -15,7 +15,7 @@
 void menu_page1();
 void menu_page2();
 void menu_page3();
-void menu_page4();
+void menu_page4(bool dir);
 
 
 #endif /* MENU_H_ */
